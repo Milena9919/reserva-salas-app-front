@@ -1,9 +1,12 @@
+import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 export default function Reservas() {
+  const navigation = useNavigation();
+
   // Estados para sala
   const [salaSelecionada, setSalaSelecionada] = useState(null);
   const [openSala, setOpenSala] = useState(false);
@@ -46,6 +49,10 @@ export default function Reservas() {
     alert(
       `✅ Reserva confirmada!\n\nSala: ${salaSelecionada}\nData: ${data.toLocaleDateString()}\nHorário: ${inicio} às ${fim}`
     );
+  };
+
+  const handleLogout = () => {
+    navigation.navigate("Login");
   };
 
   return (
@@ -125,6 +132,11 @@ export default function Reservas() {
       <TouchableOpacity style={styles.button} onPress={confirmarReserva}>
         <Text style={styles.buttonText}>Confirmar</Text>
       </TouchableOpacity>
+
+      {/* Botão Sair */}
+      <TouchableOpacity style={[styles.button, styles.logoutButton]} onPress={handleLogout}>
+        <Text style={styles.buttonText}>Sair</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -141,10 +153,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 50,
     fontWeight: "bold",
+    color: "#2c3e50",
   },
   label: {
     fontSize: 17,
     marginBottom: 6,
+    color: "#2c3e50",
   },
   dropdown: {
     borderColor: "#2ecc71",
@@ -167,12 +181,17 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: "#2ecc71",
-    padding: 12,
+    paddingVertical: 12,
     borderRadius: 30,
     alignItems: "center",
+    marginBottom: 15,
+  },
+  logoutButton: {
+    backgroundColor: "#27ae60", // verde um pouco mais escuro
   },
   buttonText: {
     color: "#fff",
     fontWeight: "bold",
+    fontSize: 16,
   },
 });

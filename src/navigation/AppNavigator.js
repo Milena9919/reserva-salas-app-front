@@ -1,32 +1,26 @@
 // src/navigation/AppNavigator.js
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import CadastrarSala from '../screens/CadastrarSala';
-import CadastrarUsuario from '../screens/CadastrarUsuario';
+// Telas
 import Login from '../screens/Login';
-import Reservas from '../screens/Reservas';
+
+// Navegações separadas
+import AdminTabs from './AdminTabs';
+import UsuarioTabs from './UsuarioTabs';
 
 const Stack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
-
-function MainTabs() {
-  return (
-    <Tab.Navigator screenOptions={{ headerShown: false }}>
-      <Tab.Screen name="Reservas" component={Reservas} />
-      <Tab.Screen name="CadastrarUsuario" component={CadastrarUsuario} />
-      <Tab.Screen name="CadastrarSala" component={CadastrarSala} />
-    </Tab.Navigator>
-  );
-}
 
 export default function AppNavigator() {
   return (
     <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
-        <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {/* Tela inicial */}
+        <Stack.Screen name="Login" component={Login} />
+
+        {/* Rotas principais */}
+        <Stack.Screen name="AdminMain" component={AdminTabs} />
+        <Stack.Screen name="UserMain" component={UsuarioTabs} />
       </Stack.Navigator>
     </NavigationContainer>
   );
