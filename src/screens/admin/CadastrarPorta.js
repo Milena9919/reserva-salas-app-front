@@ -26,7 +26,7 @@ export default function CadastrarSala() {
   return (
     <View style={styles.container}>
       <Input
-        label="Identificação da sala"
+        label="Número da Porta"
         value={nome}
         onChangeText={setNome}
       />

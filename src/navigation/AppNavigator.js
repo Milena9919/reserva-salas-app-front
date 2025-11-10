@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 // Telas
 import Login from '../screens/Login';
+import HistoricoReservas from '../screens/usuario/HistoricoReservas';
 
 // Navegações separadas
 import AdminTabs from './AdminTabs';
@@ -21,6 +22,18 @@ export default function AppNavigator() {
         {/* Rotas principais */}
         <Stack.Screen name="AdminMain" component={AdminTabs} />
         <Stack.Screen name="UserMain" component={UsuarioTabs} />
+
+        {/* Tela de histórico do usuário */}
+        <Stack.Screen
+          name="HistoricoReservas"
+          component={HistoricoReservas}
+          options={{
+            headerShown: true,
+            title: 'Histórico de Reservas',
+            headerStyle: { backgroundColor: '#27ae60' },
+            headerTintColor: '#fff',
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

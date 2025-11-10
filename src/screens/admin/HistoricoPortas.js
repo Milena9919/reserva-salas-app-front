@@ -1,34 +1,102 @@
 // src/screens/admin/HistoricoPortas.js
 import { useNavigation } from '@react-navigation/native';
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useMemo, useState } from 'react';
+import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-const historico = [
-  { id: '1', porta: 'Laboratório 3', data: '15/10/2025 21:00 até 22:50' },
-  { id: '2', porta: 'Laboratório 11', data: '14/10/2025 21:00 até 22:50' },
-  { id: '3', porta: 'Sala 103', data: '12/10/2025 19:00 até 20:50' },
+const historicoMock = [
+  { id: '1', porta: 'Laboratório 3', usuario: 'Thiago', data: '2025-10-15T21:00:00', status: 'Concluída' },
+  { id: '2', porta: 'Sala 103', usuario: 'Milena', data: '2025-10-12T19:00:00', status: 'Cancelada' },
+  { id: '3', porta: 'Laboratório 11', usuario: 'João', data: '2025-10-14T21:00:00', status: 'Ativa' },
 ];
 
-export default function HistoricoPortas() {
+export default function HistoricoPortas({ route }) {
   const navigation = useNavigation();
+  const isAdmin = route?.params?.isAdmin ?? true; // valida se é admin (mockado como true)
+  
+  // se não for admin → bloqueia
+  if (!isAdmin) {
+    return (
+      <View style={styles.blockedContainer}>
+        <Text style={styles.blockedText}>Acesso restrito aos administradores.</Text>
+      </View>
+    );
+  }
 
-  const handleLogout = () => {
-    navigation.navigate('Login');
-  };
+  const [filtroUsuario, setFiltroUsuario] = useState('');
+  const [filtroStatus, setFiltroStatus] = useState('');
+  const [filtroData, setFiltroData] = useState('');
+
+  // aplica ordenação (mais recente primeiro) e filtros
+  const historicoFiltrado = useMemo(() => {
+    return historicoMock
+      .filter(item => {
+        const dataItem = new Date(item.data).toLocaleDateString('pt-BR');
+        return (
+          (filtroUsuario ? item.usuario.toLowerCase().includes(filtroUsuario.toLowerCase()) : true) &&
+          (filtroStatus ? item.status.toLowerCase().includes(filtroStatus.toLowerCase()) : true) &&
+          (filtroData ? dataItem.includes(filtroData) : true)
+        );
+      })
+      .sort((a, b) => new Date(b.data) - new Date(a.data));
+  }, [filtroUsuario, filtroStatus, filtroData]);
+
+  const handleLogout = () => navigation.navigate('Login');
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Reservas Recentes</Text>
+      <Text style={styles.title}>Histórico de Portas</Text>
 
-      <FlatList
-        data={historico}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Text style={styles.porta}>{item.porta}</Text>
-            <Text style={styles.data}>{item.data}</Text>
-          </View>
-        )}
-      />
+      {/* Filtros */}
+      <View style={styles.filtros}>
+        <TextInput
+          style={styles.input}
+          placeholder="Filtrar por usuário"
+          value={filtroUsuario}
+          onChangeText={setFiltroUsuario}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Filtrar por status (Ativa/Concluída/Cancelada)"
+          value={filtroStatus}
+          onChangeText={setFiltroStatus}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Filtrar por data (dd/mm/aaaa)"
+          value={filtroData}
+          onChangeText={setFiltroData}
+        />
+      </View>
+
+      {/* Lista */}
+      {historicoFiltrado.length === 0 ? (
+        <Text style={styles.noRecords}>Nenhum registro encontrado.</Text>
+      ) : (
+        <FlatList
+          data={historicoFiltrado}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => {
+            const dataHora = new Date(item.data).toLocaleString('pt-BR', {
+              dateStyle: 'short',
+              timeStyle: 'short',
+            });
+            return (
+              <View style={styles.card}>
+                <Text style={styles.porta}>{item.porta}</Text>
+                <Text style={styles.info}>Usuário: {item.usuario}</Text>
+                <Text style={styles.info}>Data/Hora: {dataHora}</Text>
+                <Text style={[styles.status, 
+                  item.status === 'Ativa' ? styles.statusAtiva :
+                  item.status === 'Concluída' ? styles.statusConcluida :
+                  styles.statusCancelada
+                ]}>
+                  {item.status}
+                </Text>
+              </View>
+            );
+          }}
+        />
+      )}
 
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutText}>Sair</Text>
@@ -40,36 +108,67 @@ export default function HistoricoPortas() {
 const styles = StyleSheet.create({
   container: { 
     flex: 1, 
-    backgroundColor: '#f5f5f5', 
-    padding: 20, 
-    justifyContent: 'center' 
+    backgroundColor: '#f8f9fa', 
+    padding: 20 
   },
   title: { 
-    fontSize: 20, 
+    fontSize: 22, 
     fontWeight: 'bold', 
+    textAlign: 'center', 
     marginBottom: 15, 
-    textAlign: 'center' 
+    color: '#2c3e50' 
+  },
+  filtros: {
+    marginBottom: 10,
+  },
+  input: {
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 10,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
   },
   card: {
     backgroundColor: '#fff',
     padding: 15,
     borderRadius: 10,
     marginBottom: 10,
-    elevation: 2,
+    elevation: 3,
   },
-  porta: { fontSize: 16, fontWeight: 'bold' },
-  data: { fontSize: 14, color: '#666' },
+  porta: { fontSize: 16, fontWeight: 'bold', color: '#34495e' },
+  info: { fontSize: 14, color: '#555' },
+  status: { marginTop: 5, fontWeight: 'bold' },
+  statusAtiva: { color: '#2980b9' },
+  statusConcluida: { color: '#27ae60' },
+  statusCancelada: { color: '#c0392b' },
   logoutButton: {
-    backgroundColor: '#27ae60', // verde
+    backgroundColor: '#27ae60',
     paddingVertical: 12,
-    paddingHorizontal: 25,
-    borderRadius: 30,
+    borderRadius: 25,
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 10,
   },
   logoutText: {
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  noRecords: {
+    textAlign: 'center',
+    color: '#7f8c8d',
+    marginTop: 20,
+    fontSize: 16,
+  },
+  blockedContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f8d7da',
+  },
+  blockedText: {
+    color: '#721c24',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
