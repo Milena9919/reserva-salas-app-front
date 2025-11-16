@@ -1,4 +1,3 @@
-// src/screens/admin/HistoricoPortas.js
 import { useNavigation } from '@react-navigation/native';
 import { useMemo, useState } from 'react';
 import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -11,9 +10,8 @@ const historicoMock = [
 
 export default function HistoricoPortas({ route }) {
   const navigation = useNavigation();
-  const isAdmin = route?.params?.isAdmin ?? true; // valida se é admin (mockado como true)
-  
-  // se não for admin → bloqueia
+  const isAdmin = route?.params?.isAdmin ?? true;
+
   if (!isAdmin) {
     return (
       <View style={styles.blockedContainer}>
@@ -26,15 +24,14 @@ export default function HistoricoPortas({ route }) {
   const [filtroStatus, setFiltroStatus] = useState('');
   const [filtroData, setFiltroData] = useState('');
 
-  // aplica ordenação (mais recente primeiro) e filtros
   const historicoFiltrado = useMemo(() => {
     return historicoMock
       .filter(item => {
         const dataItem = new Date(item.data).toLocaleDateString('pt-BR');
         return (
-          (filtroUsuario ? item.usuario.toLowerCase().includes(filtroUsuario.toLowerCase()) : true) &&
-          (filtroStatus ? item.status.toLowerCase().includes(filtroStatus.toLowerCase()) : true) &&
-          (filtroData ? dataItem.includes(filtroData) : true)
+          (!filtroUsuario || item.usuario.toLowerCase().includes(filtroUsuario.toLowerCase())) &&
+          (!filtroStatus || item.status.toLowerCase().includes(filtroStatus.toLowerCase())) &&
+          (!filtroData || dataItem.includes(filtroData))
         );
       })
       .sort((a, b) => new Date(b.data) - new Date(a.data));
@@ -44,6 +41,11 @@ export default function HistoricoPortas({ route }) {
 
   return (
     <View style={styles.container}>
+
+      {/* Círculos decorativos */}
+      <View style={styles.circleTop} />
+      <View style={styles.circleBottom} />
+
       <Text style={styles.title}>Histórico de Portas</Text>
 
       {/* Filtros */}
@@ -51,18 +53,21 @@ export default function HistoricoPortas({ route }) {
         <TextInput
           style={styles.input}
           placeholder="Filtrar por usuário"
+          placeholderTextColor="#94a3b8"
           value={filtroUsuario}
           onChangeText={setFiltroUsuario}
         />
         <TextInput
           style={styles.input}
           placeholder="Filtrar por status (Ativa/Concluída/Cancelada)"
+          placeholderTextColor="#94a3b8"
           value={filtroStatus}
           onChangeText={setFiltroStatus}
         />
         <TextInput
           style={styles.input}
           placeholder="Filtrar por data (dd/mm/aaaa)"
+          placeholderTextColor="#94a3b8"
           value={filtroData}
           onChangeText={setFiltroData}
         />
@@ -75,6 +80,7 @@ export default function HistoricoPortas({ route }) {
         <FlatList
           data={historicoFiltrado}
           keyExtractor={(item) => item.id}
+          showsVerticalScrollIndicator={false}
           renderItem={({ item }) => {
             const dataHora = new Date(item.data).toLocaleString('pt-BR', {
               dateStyle: 'short',
@@ -83,13 +89,17 @@ export default function HistoricoPortas({ route }) {
             return (
               <View style={styles.card}>
                 <Text style={styles.porta}>{item.porta}</Text>
-                <Text style={styles.info}>Usuário: {item.usuario}</Text>
-                <Text style={styles.info}>Data/Hora: {dataHora}</Text>
-                <Text style={[styles.status, 
-                  item.status === 'Ativa' ? styles.statusAtiva :
-                  item.status === 'Concluída' ? styles.statusConcluida :
-                  styles.statusCancelada
-                ]}>
+                <Text style={styles.info}>Usuário: <Text style={styles.infoValue}>{item.usuario}</Text></Text>
+                <Text style={styles.info}>Data/Hora: <Text style={styles.infoValue}>{dataHora}</Text></Text>
+
+                <Text
+                  style={[
+                    styles.status,
+                    item.status === 'Ativa' ? styles.statusAtiva :
+                    item.status === 'Concluída' ? styles.statusConcluida :
+                    styles.statusCancelada
+                  ]}
+                >
                   {item.status}
                 </Text>
               </View>
@@ -107,68 +117,103 @@ export default function HistoricoPortas({ route }) {
 
 const styles = StyleSheet.create({
   container: { 
-    flex: 1, 
-    backgroundColor: '#f8f9fa', 
-    padding: 20 
+    flex: 1,
+    backgroundColor: '#0d1b2a',
+    padding: 24,
   },
+
   title: { 
-    fontSize: 22, 
-    fontWeight: 'bold', 
-    textAlign: 'center', 
-    marginBottom: 15, 
-    color: '#2c3e50' 
+    fontSize: 26,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginTop: 70,
+    marginBottom: 25,
+    textAlign: 'left',
   },
-  filtros: {
-    marginBottom: 10,
-  },
+
+  filtros: { marginBottom: 10 },
+
   input: {
-    backgroundColor: '#fff',
-    padding: 10,
-    borderRadius: 10,
-    marginBottom: 8,
-    borderWidth: 1,
-    borderColor: '#ccc',
-  },
-  card: {
-    backgroundColor: '#fff',
-    padding: 15,
+    backgroundColor: '#1C3B70',
+    padding: 12,
     borderRadius: 10,
     marginBottom: 10,
-    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#334155',
+    color: '#fff',
   },
-  porta: { fontSize: 16, fontWeight: 'bold', color: '#34495e' },
-  info: { fontSize: 14, color: '#555' },
-  status: { marginTop: 5, fontWeight: 'bold' },
-  statusAtiva: { color: '#2980b9' },
-  statusConcluida: { color: '#27ae60' },
-  statusCancelada: { color: '#c0392b' },
+
+  card: {
+    backgroundColor: '#1C3B70',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#334155',
+  },
+
+  porta: { fontSize: 17, fontWeight: 'bold', color: '#fff', marginBottom: 4 },
+  info: { fontSize: 14, color: '#cbd5e1' },
+  infoValue: { color: '#fff' },
+
+  status: { marginTop: 8, fontWeight: 'bold', fontSize: 15 },
+  statusAtiva: { color: '#38bdf8' },
+  statusConcluida: { color: '#22c55e' },
+  statusCancelada: { color: '#ef4444' },
+
+  noRecords: {
+    textAlign: 'center',
+    color: '#94a3b8',
+    marginTop: 20,
+    fontSize: 16,
+  },
+
   logoutButton: {
-    backgroundColor: '#27ae60',
+    backgroundColor: '#22c55e',
     paddingVertical: 12,
-    borderRadius: 25,
+    borderRadius: 10,
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 20,
   },
   logoutText: {
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
   },
-  noRecords: {
-    textAlign: 'center',
-    color: '#7f8c8d',
-    marginTop: 20,
-    fontSize: 16,
+
+  circleTop: {
+    position: 'absolute',
+    width: 260,
+    height: 260,
+    borderRadius: 260,
+    backgroundColor: '#1C3B70',
+    top: -120,
+    left: -80,
+    opacity: 0.28,
+    zIndex: -1,
   },
+
+  circleBottom: {
+    position: 'absolute',
+    width: 260,
+    height: 260,
+    borderRadius: 260,
+    backgroundColor: '#1C3B70',
+    bottom: -120,
+    right: -60,
+    opacity: 0.28,
+    zIndex: -1,
+  },
+
   blockedContainer: {
     flex: 1,
+    backgroundColor: '#0d1b2a',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f8d7da',
   },
   blockedText: {
-    color: '#721c24',
-    fontSize: 16,
+    color: '#fff',
+    fontSize: 18,
     fontWeight: 'bold',
   },
 });

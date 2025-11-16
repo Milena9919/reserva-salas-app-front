@@ -6,28 +6,36 @@ export default function Login({ navigation }) {
   const [senha, setSenha] = useState('');
 
   const handleLogin = () => {
-  if (email === 'admin' && senha === '123') {
-    navigation.replace('AdminMain'); // Direciona para as tabs do admin
-  } else if (email === 'usuario' && senha === '123') {
-    navigation.replace('UserMain'); // Direciona para as tabs do usuário
-  } else {
-    alert('Usuário ou senha incorretos');
-  }
-};
-
+    if (email === 'admin' && senha === '123') {
+      navigation.replace('AdminMain');
+    } else if (email === 'usuario' && senha === '123') {
+      navigation.replace('UserMain');
+    } else {
+      alert('Usuário ou senha incorretos');
+    }
+  };
 
   return (
     <View style={styles.container}>
+      
+      {/* Círculos decorativos */}
+      <View style={styles.circleTop} />
+      <View style={styles.circleBottom} />
+
       {/* Logo */}
-      <Image source={require('../../assets/images/logo.jpeg')} style={styles.logo} />
+      <Image 
+        source={require('../../assets/images/logo.jpeg')} 
+        style={styles.logo} 
+      />
 
+      {/* Texto de boas-vindas */}
+      <Text style={styles.welcome}>Bem-vindo de volta</Text>
+      <Text style={styles.subtitle}>Acesse sua conta para gerenciar as reservas</Text>
 
-      {/* Título */}
-      <Text style={styles.title}>Login</Text>
-
-      {/* Inputs */}
+      {/* Inputs estilo linha */}
       <TextInput
         placeholder="Digite seu email"
+        placeholderTextColor="#aaa"
         value={email}
         onChangeText={setEmail}
         style={styles.input}
@@ -35,6 +43,7 @@ export default function Login({ navigation }) {
 
       <TextInput
         placeholder="Digite sua senha"
+        placeholderTextColor="#aaa"
         value={senha}
         onChangeText={setSenha}
         secureTextEntry
@@ -47,7 +56,7 @@ export default function Login({ navigation }) {
       </TouchableOpacity>
 
       <Text style={styles.forgotPassword}>
-        Esqueceu a senha? <Text style={styles.link}>REDEFINIR SENHA</Text>
+        Esqueceu a senha? <Text style={styles.link}>Redefinir</Text>
       </Text>
     </View>
   );
@@ -58,45 +67,86 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5F6FA',
+    backgroundColor: '#0E1B30',
     paddingHorizontal: 20,
   },
+
+  /** Decorações circulares como no print */
+  circleTop: {
+    position: 'absolute',
+    width: 300,
+    height: 300,
+    borderRadius: 300,
+    backgroundColor: '#1C3B70',
+    top: -120,
+    left: -80,
+    opacity: 0.4,
+  },
+  circleBottom: {
+    position: 'absolute',
+    width: 260,
+    height: 260,
+    borderRadius: 260,
+    backgroundColor: '#1C3B70',
+    bottom: -100,
+    right: -60,
+    opacity: 0.35,
+  },
+
   logo: {
     width: 140,
-    height: 150,
-    resizeMode: 'contain',
+    height: 140,
+    resizeMode: 'cover',
+    borderRadius: 70,
     marginBottom: 10,
   },
-  title: {
-    fontSize: 26,
+
+  welcome: {
+    color: '#fff',
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 25,
+    marginTop: 10,
   },
+
+  subtitle: {
+    color: '#d0d0d0',
+    fontSize: 14,
+    marginBottom: 30,
+  },
+
   input: {
     width: '90%',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    marginBottom: 15,
-    borderRadius: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#6AA9E9',
+    color: '#fff',
+    paddingVertical: 8,
+    marginBottom: 20,
+    fontSize: 16,
   },
+
   button: {
-    backgroundColor: '#32CD32',
-    padding: 12,
+    backgroundColor: '#27AE60',
+    paddingVertical: 12,
     borderRadius: 8,
     width: '90%',
     alignItems: 'center',
+    marginTop: 10,
   },
+
   buttonText: {
     color: '#fff',
+    fontSize: 16,
     fontWeight: 'bold',
   },
+
   forgotPassword: {
     marginTop: 15,
-    color: '#555',
+    color: '#ccc',
   },
+
   link: {
-    color: '#0066cc',
+    color: '#6AA9E9',
+    fontWeight: 'bold',
     textDecorationLine: 'underline',
   },
 });
